@@ -1,0 +1,58 @@
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>IoMT Health Monitor</title>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: system-ui, sans-serif; background: #0f1117; color: #eee; padding: 40px; }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    .sub { color: #888; margin-bottom: 32px; font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 720px; }
+    .card { background: #1a1d26; border: 1px solid #2a2d38; border-radius: 12px; padding: 24px; }
+    .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #888; }
+    .value { font-size: 36px; font-weight: 600; margin-top: 8px; }
+    .status { margin-top: 32px; padding: 16px; border-radius: 10px; font-weight: 600; }
+    .NORMAL { background: #14321e; color: #4ade80; border: 1px solid #22633a; }
+    .WARNING { background: #3a2e0f; color: #fbbf24; border: 1px solid #6b5314; }
+    .CRITICAL { background: #3a1414; color: #f87171; border: 1px solid #6b2020; }
+  </style>
+</head>
+<body>
+  <h1>IoMT — Internet of Medical Things</h1>
+  <p class="sub">Real-time patient health monitoring · Built by Vishwa A J</p>
+
+  <div class="grid">
+    <div class="card">
+      <div class="label">Heart Rate</div>
+      <div class="value" id="hr">--</div>
+    </div>
+    <div class="card">
+      <div class="label">SpO₂</div>
+      <div class="value" id="spo2">--</div>
+    </div>
+    <div class="card">
+      <div class="label">Temperature</div>
+      <div class="value" id="temp">--</div>
+    </div>
+  </div>
+
+  <div id="status" class="status NORMAL">Waiting for data...</div>
+
+  <script>
+    async function update() {
+      const res = await fetch('/api/vitals');
+      const d = await res.json();
+      if (!d.heart_rate) return;
+      document.getElementById('hr').textContent = d.heart_rate + ' bpm';
+      document.getElementById('spo2').textContent = d.spo2 + '%';
+      document.getElementById('temp').textContent = d.temperature + '°C';
+      const s = document.getElementById('status');
+      s.textContent = 'Status: ' + d.status + ' · ' + d.timestamp;
+      s.className = 'status ' + d.status;
+    }
+    setInterval(update, 2000);
+    update();
+  </script>
+</body>
+</html>
